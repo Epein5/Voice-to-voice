@@ -1,0 +1,122 @@
+# Bachelor of Engineering in Computer Engineering (CE)
+
+-c-h-u-n-k-h-e-r-e-
+
+## Computer Engineering (CE) Program Overview
+The Bachelor of Engineering in Computer Engineering program at Kathmandu University is a four-year, eight-semester course that provides a strong foundation in the principles and practices of both computer science and electronics engineering. The curriculum is designed to produce graduates who are proficient in designing, developing, and implementing computer systems and applications. The program emphasizes a hands-on, project-based learning approach, preparing students for careers in software development, network engineering, embedded systems, and other related fields.
+
+-c-h-u-n-k-h-e-r-e-
+
+## Computer Engineering (CE) Program Objectives
+- To provide a solid understanding of the fundamental principles of computer science and engineering.
+- To develop skills in software design, development, and testing.
+- To provide knowledge of computer hardware, architecture, and networking.
+- To foster an understanding of the social, ethical, and professional responsibilities of a computer engineer.
+- To encourage lifelong learning and research in the field of computer engineering.
+
+-c-h-u-n-k-h-e-r-e-
+
+## Computer Engineering (CE) Career Prospects
+Graduates of the Computer Engineering program have a wide range of career opportunities in various sectors, including:
+- Software Development Companies
+- IT Consultancies
+- Telecommunication Companies
+- Government and Non-Governmental Organizations
+- Research and Development Institutions
+- Academia
+
+-c-h-u-n-k-h-e-r-e-
+
+## Computer Engineering (CE) Fee Structure
+The total fee for the 4-year Computer Engineering program is NPR 915,000. This is broken down into semester-wise payments as follows (amounts are approximate and subject to change):
+- **Admission Fee:** NPR 100,000 (one-time payment at the time of admission)
+- **Security Deposit:** NPR 10,000 (one-time, refundable)
+- **Semester 1 Fee:** NPR 101,875
+- **Semester 2 Fee:** NPR 101,875
+- **Semester 3 Fee:** NPR 101,875
+- **Semester 4 Fee:** NPR 101,875
+- **Semester 5 Fee:** NPR 101,875
+- **Semester 6 Fee:** NPR 101,875
+- **Semester 7 Fee:** NPR 101,875
+- **Semester 8 Fee:** NPR 101,875
+- **Note:** Additional fees for exams, lab materials, and other miscellaneous expenses may be applicable.
+
+-c-h-u-n-k-h-e-r-e-
+
+## Computer Engineering (CE) Course Structure
+
+### Year 1, Semester 1
+- MATH 101: Calculus and Linear Algebra
+- PHYS 101: General Physics I
+- ENGG 101: Introduction to Engineering
+- COMP 101: Computer Programming I (C)
+- EEEG 101: Basic Electrical Engineering
+- ENGT 101: Communication Skills I
+
+### Year 1, Semester 2
+- MATH 102: Differential Equations and Complex Variables
+- PHYS 102: General Physics II
+- COMP 102: Computer Programming II (C++)
+- EEEG 102: Basic Electronics Engineering
+- MECH 101: Engineering Drawing
+- ENGT 102: Communication Skills II
+
+### Year 2, Semester 1
+- MATH 201: Probability and Statistics
+- COMP 201: Data Structures and Algorithms
+- COMP 202: Object-Oriented Programming (Java)
+- EEEG 201: Digital Logic
+- EEEG 202: Electric Circuits and Machines
+- MGTS 201: Principles of Management
+
+### Year 2, Semester 2
+- MATH 202: Numerical Methods
+- COMP 203: Database Management Systems
+- COMP 204: Computer Organization and Architecture
+- EEEG 203: Electronic Devices and Circuits
+- EEEG 204: Microprocessors
+- ENVE 201: Environmental Science and Engineering
+
+### Year 3, Semester 1
+- COMP 301: Operating Systems
+- COMP 302: Computer Networks
+- COMP 303: Software Engineering
+- COMP 304: Theory of Computation
+- EEEG 301: Signals and Systems
+- Project I
+
+### Year 3, Semester 2
+- COMP 305: Artificial Intelligence
+- COMP 306: Web Technologies
+- COMP 307: Compiler Design
+- Elective I
+- Elective II
+- Project II
+
+### Year 4, Semester 1
+- COMP 401: Computer Graphics
+- COMP 402: Network and Cyber Security
+- Elective III
+- Elective IV
+- Project III
+- Internship
+
+### Year 4, Semester 2
+- COMP 403: Distributed Systems
+- MGTS 401: Engineering Economics
+- ENGT 401: Professional Practice
+- Elective V
+- Final Year Project
+
+-c-h-u-n-k-h-e-r-e-
+
+## Computer Engineering (CE) Elective Courses
+Students can choose from a range of elective courses in areas such as:
+- Machine Learning
+- Data Science and Big Data Analytics
+- Cloud Computing
+- Internet of Things (IoT)
+- Mobile Application Development
+- Robotics and Automation
+- Digital Image Processing
+- Natural Language Processing

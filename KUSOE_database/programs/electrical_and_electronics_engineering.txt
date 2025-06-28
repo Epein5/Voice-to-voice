@@ -1,0 +1,119 @@
+# Bachelor of Engineering in Electrical and Electronics Engineering (EE)
+
+-c-h-u-n-k-h-e-r-e-
+
+## Electrical and Electronics Engineering (EE) Program Overview
+The Bachelor of Engineering in Electrical and Electronics Engineering at KUSOE is a four-year program designed to provide students with a comprehensive understanding of electrical and electronic principles. The curriculum covers a wide range of topics, including power systems, electronics, telecommunications, and control systems. The program aims to produce skilled engineers who can design, develop, and maintain electrical and electronic systems in various industries.
+
+-c-h-u-n-k-h-e-r-e-
+
+## Electrical and Electronics Engineering (EE) Program Objectives
+- To provide a strong foundation in the principles of electrical and electronics engineering.
+- To develop skills in the design and analysis of electrical and electronic circuits and systems.
+- To provide knowledge of power generation, transmission, and distribution.
+- To foster an understanding of communication systems and signal processing.
+- To encourage research and development in the field of electrical and electronics engineering.
+
+-c-h-u-n-k-h-e-r-e-
+
+## Electrical and Electronics Engineering (EE) Career Prospects
+Graduates can pursue careers in:
+- Power Generation and Distribution Companies
+- Telecommunication Companies
+- Electronics Manufacturing Industries
+- Automation and Control Industries
+- Renewable Energy Sector
+- Research and Development
+
+-c-h-u-n-k-h-e-r-e-
+
+## Electrical and Electronics Engineering (EE) Fee Structure
+The total fee for the 4-year Electrical and Electronics Engineering program is NPR 915,000. This is broken down into semester-wise payments as follows (amounts are approximate and subject to change):
+- **Admission Fee:** NPR 100,000 (one-time payment at the time of admission)
+- **Security Deposit:** NPR 10,000 (one-time, refundable)
+- **Semester 1 Fee:** NPR 101,875
+- **Semester 2 Fee:** NPR 101,875
+- **Semester 3 Fee:** NPR 101,875
+- **Semester 4 Fee:** NPR 101,875
+- **Semester 5 Fee:** NPR 101,875
+- **Semester 6 Fee:** NPR 101,875
+- **Semester 7 Fee:** NPR 101,875
+- **Semester 8 Fee:** NPR 101,875
+- **Note:** Additional fees for exams, lab materials, and other miscellaneous expenses may be applicable.
+
+-c-h-u-n-k-h-e-r-e-
+
+## Electrical and Electronics Engineering (EE) Course Structure
+
+### Year 1, Semester 1
+- MATH 101: Calculus and Linear Algebra
+- PHYS 101: General Physics I
+- ENGG 101: Introduction to Engineering
+- COMP 101: Computer Programming I (C)
+- EEEG 101: Basic Electrical Engineering
+- ENGT 101: Communication Skills I
+
+### Year 1, Semester 2
+- MATH 102: Differential Equations and Complex Variables
+- PHYS 102: General Physics II
+- COMP 102: Computer Programming II (C++)
+- EEEG 102: Basic Electronics Engineering
+- MECH 101: Engineering Drawing
+- ENGT 102: Communication Skills II
+
+### Year 2, Semester 1
+- MATH 201: Probability and Statistics
+- EEEG 201: Digital Logic
+- EEEG 202: Electric Circuits and Machines
+- EEEG 203: Electronic Devices and Circuits
+- MECH 202: Thermodynamics and Heat Transfer
+- MGTS 201: Principles of Management
+
+### Year 2, Semester 2
+- MATH 202: Numerical Methods
+- EEEG 204: Microprocessors
+- EEEG 205: Electromagnetic Fields and Waves
+- EEEG 206: Instrumentation and Measurement
+- COMP 201: Data Structures and Algorithms
+- ENVE 201: Environmental Science and Engineering
+
+### Year 3, Semester 1
+- EEEG 301: Signals and Systems
+- EEEG 302: Control Systems
+- EEEG 303: Power Systems I
+- EEEG 304: Communication Systems I
+- EEEG 305: Power Electronics
+- Project I
+
+### Year 3, Semester 2
+- EEEG 306: Digital Signal Processing
+- EEEG 307: Power Systems II
+- EEEG 308: Communication Systems II
+- Elective I
+- Elective II
+- Project II
+
+### Year 4, Semester 1
+- EEEG 401: High Voltage Engineering
+- EEEG 402: Renewable Energy Systems
+- Elective III
+- Elective IV
+- Project III
+- Internship
+
+### Year 4, Semester 2
+- EEEG 403: Power System Protection
+- MGTS 401: Engineering Economics
+- ENGT 401: Professional Practice
+- Elective V
+- Final Year Project
+
+-c-h-u-n-k-h-e-r-e-
+
+## Electrical and Electronics Engineering (EE) Elective Courses
+- VLSI Design
+- Wireless Communication
+- Smart Grid Technology
+- Robotics and Automation
+- Biomedical Instrumentation
+- Satellite Communication
