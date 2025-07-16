@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-to-Voice Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #1f1f1f;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-bar {
+            padding: 12px 24px;
+            background: #111111;
+            border-bottom: 1px solid #1f1f1f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status {
+            font-size: 14px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status.connected {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .status.disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .status.recording {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #f0f0f0;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid #333333;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #1f1f1f;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #dc2626;
+        }
+
+        .btn-recording {
+            background: #fbbf24;
+            color: #000000;
+        }
+
+        .btn-recording:hover:not(:disabled) {
+            background: #f59e0b;
+        }
+
+        .voice-activity-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .voice-activity-indicator.hidden {
+            display: none;
+        }
+
+        .voice-activity-indicator.listening {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .voice-activity-indicator.speaking {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .voice-activity-indicator.processing {
+            background: rgba(147, 51, 234, 0.1);
+            border-color: rgba(147, 51, 234, 0.2);
+            color: #9333ea;
+        }
+
+        .voice-indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        .voice-activity-indicator.speaking .voice-indicator-dot {
+            animation: fastPulse 0.5s infinite;
+        }
+
+        .voice-activity-indicator.processing .voice-indicator-dot {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes fastPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: #111111;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 3px;
+        }
+
+        .message {
+            max-width: 70%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            align-items: flex-start;
+        }
+
+        .message.system {
+            align-self: center;
+            align-items: center;
+            max-width: 50%;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .message.bot .message-content {
+            background: #1f1f1f;
+            color: #ffffff;
+            border: 1px solid #333333;
+        }
+
+        .message.system .message-content {
+            background: rgba(156, 163, 175, 0.1);
+            color: #9ca3af;
+            border: 1px solid rgba(156, 163, 175, 0.2);
+            font-style: italic;
+            text-align: center;
+        }
+
+        .rag-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #60a5fa;
+            margin-top: 4px;
+        }
+
+        .rag-info .label {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .audio-player {
+            background: #111111;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 8px;
+        }
+
+        .audio-player audio {
+            width: 100%;
+            height: 32px;
+        }
+
+        .input-container {
+            padding: 24px;
+            background: #111111;
+            border-top: 1px solid #1f1f1f;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .text-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: #1f1f1f;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .text-input:focus {
+            border-color: #ffffff;
+        }
+
+        .text-input::placeholder {
+            color: #666666;
+        }
+
+        .recording-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #fbbf24;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #666666;
+            margin-top: 40px;
+            font-size: 16px;
+        }
+
+        .welcome-message h2 {
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 12px 16px;
+            background: #1f1f1f;
+            border-radius: 16px;
+            align-self: flex-start;
+        }
+
+        .typing-dot {
+            width: 4px;
+            height: 4px;
+            background: #666666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>🎙️</span>
+                Voice-to-Voice Chat
+            </h1>
+        </div>
+
+        <div class="status-bar">
+            <div class="status disconnected" id="status">
+                <span>●</span>
+                Call Disconnected
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="connectBtn" onclick="connect()">Start Call</button>
+                <button class="btn btn-danger" id="disconnectBtn" onclick="disconnect()" disabled>End Call</button>
+                <div class="voice-activity-indicator hidden" id="voiceActivity">
+                    <div class="voice-indicator-dot"></div>
+                    <span id="voiceStatus">Listening...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-container" id="chatContainer">
+                <div class="empty-state">
+                    <div class="welcome-message">
+                        <h2>Welcome to Voice-to-Voice Chat</h2>
+                        <p>Connect to the server and start talking. I can help you with KUSOE-related questions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="input-row">
+                <input type="text" class="text-input" id="textInput" placeholder="Type your message here..." onkeypress="handleKeyPress(event)">
+                <button class="btn btn-primary" id="sendBtn" onclick="sendTextMessage()" disabled>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let isProcessing = false;
+        let isCallActive = false;
+        let audioContext = null;
+        let analyser = null;
+        let microphone = null;
+        let stream = null;
+        let silenceTimer = null;
+        let voiceActivityTimer = null;
+        let isListening = false;
+        let userInteracted = false; // Track user interaction for auto-play
+        
+        // Enable auto-play after user interaction
+        document.addEventListener('click', function() {
+            userInteracted = true;
+        });
+        
+        document.addEventListener('keydown', function() {
+            userInteracted = true;
+        });
+        
+        // Voice activity detection parameters (optimized for speed)
+        const SILENCE_THRESHOLD = 0.008; // Lower threshold for faster detection
+        const SILENCE_DURATION = 1000; // Reduced to 1 second
+        const MIN_RECORDING_TIME = 300; // Reduced minimum recording time
+        const VOICE_ACTIVITY_THRESHOLD = 0.015; // Lower threshold for faster trigger
+        const VOICE_CHECK_INTERVAL = 50; // Check every 50ms instead of 100ms
+        
+        const statusDiv = document.getElementById('status');
+        const chatContainer = document.getElementById('chatContainer');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const voiceActivity = document.getElementById('voiceActivity');
+        const voiceStatus = document.getElementById('voiceStatus');
+        const textInput = document.getElementById('textInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        function updateStatus(message, className) {
+            statusDiv.innerHTML = `<span>●</span> ${message}`;
+            statusDiv.className = `status ${className}`;
+        }
+        
+        function updateVoiceActivity(status, className) {
+            voiceStatus.textContent = status;
+            voiceActivity.className = `voice-activity-indicator ${className}`;
+        }
+        
+        function getAudioLevel() {
+            if (!analyser) return 0;
+            
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+            
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                sum += dataArray[i];
+            }
+            
+            return sum / bufferLength / 128.0; // Normalize to 0-1
+        }
+        
+        function startVoiceActivityDetection() {
+            if (!isCallActive) return;
+            
+            const audioLevel = getAudioLevel();
+            
+            if (audioLevel > VOICE_ACTIVITY_THRESHOLD) {
+                // Voice detected - start recording immediately
+                if (!isRecording && !isProcessing) {
+                    startRecording();
+                    updateVoiceActivity('Speaking...', 'speaking');
+                }
+                
+                // Clear silence timer
+                if (silenceTimer) {
+                    clearTimeout(silenceTimer);
+                    silenceTimer = null;
+                }
+                
+                // Start silence detection with reduced time
+                silenceTimer = setTimeout(() => {
+                    if (isRecording) {
+                        stopRecording();
+                    }
+                }, SILENCE_DURATION);
+            } else {
+                // No voice detected
+                if (!isRecording && !isProcessing) {
+                    updateVoiceActivity('Listening...', 'listening');
+                }
+            }
+            
+            // Continue monitoring with faster interval
+            if (isCallActive) {
+                voiceActivityTimer = setTimeout(startVoiceActivityDetection, VOICE_CHECK_INTERVAL);
+            }
+        }
+        
+        async function initializeVoiceDetection() {
+            try {
+                // Request high-quality audio with optimized settings
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        sampleRate: 16000, // Optimized for speech
+                        sampleSize: 16,
+                        channelCount: 1 // Mono for faster processing
+                    }
+                });
+                
+                // Optimize audio context for low latency
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                    sampleRate: 16000,
+                    latencyHint: 'interactive' // Prioritize low latency
+                });
+                
+                analyser = audioContext.createAnalyser();
+                microphone = audioContext.createMediaStreamSource(stream);
+                
+                // Optimize analyser settings for speed
+                analyser.fftSize = 256; // Reduced for faster processing
+                analyser.smoothingTimeConstant = 0.3; // Faster response
+                microphone.connect(analyser);
+                
+                return true;
+            } catch (error) {
+                console.error('Error initializing voice detection:', error);
+                addMessage('Error: Could not access microphone for voice detection', 'system');
+                return false;
+            }
+        }
+        
+        function cleanupVoiceDetection() {
+            if (voiceActivityTimer) {
+                clearTimeout(voiceActivityTimer);
+                voiceActivityTimer = null;
+            }
+            
+            if (silenceTimer) {
+                clearTimeout(silenceTimer);
+                silenceTimer = null;
+            }
+            
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+            
+            analyser = null;
+            microphone = null;
+            isRecording = false;
+            isProcessing = false;
+            isCallActive = false;
+        }
+        
+        function clearEmptyState() {
+            const emptyState = chatContainer.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+        }
+        
+        function addMessage(content, type, ragInfo = null) {
+            clearEmptyState();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = content;
+            
+            messageDiv.appendChild(contentDiv);
+            
+            // Add RAG information if available
+            if (ragInfo) {
+                const ragDiv = document.createElement('div');
+                ragDiv.className = 'rag-info';
+                ragDiv.innerHTML = `
+                    <div class="label">📚 Knowledge Retrieved:</div>
+                    <div>${ragInfo}</div>
+                `;
+                messageDiv.appendChild(ragDiv);
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function addAudioMessage(audioData, type) {
+            clearEmptyState();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const audioDiv = document.createElement('div');
+            audioDiv.className = 'audio-player';
+            
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.preload = 'auto';
+            
+            try {
+                const audioBlob = new Blob([audioData], { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audio.src = audioUrl;
+                
+                // Add error handling
+                audio.onerror = function(e) {
+                    console.error('Audio playback error:', e);
+                    const errorMsg = document.createElement('div');
+                    errorMsg.textContent = 'Error: Could not play audio';
+                    errorMsg.style.color = '#ff6b6b';
+                    errorMsg.style.fontSize = '12px';
+                    audioDiv.appendChild(errorMsg);
+                };
+                
+                // Add load event
+                audio.onloadeddata = function() {
+                    console.log('Audio loaded successfully');
+                };
+                
+                audioDiv.appendChild(audio);
+                messageDiv.appendChild(audioDiv);
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Auto-play the response with user gesture check
+                if (userInteracted) {
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log('Audio playing successfully');
+                        }).catch(error => {
+                            console.log('Auto-play failed:', error);
+                            // Show play button or message
+                            const playMsg = document.createElement('div');
+                            playMsg.textContent = 'Click to play audio response';
+                            playMsg.style.color = '#60a5fa';
+                            playMsg.style.fontSize = '12px';
+                            playMsg.style.marginTop = '4px';
+                            audioDiv.appendChild(playMsg);
+                        });
+                    }
+                } else {
+                    // User hasn't interacted yet, show message
+                    const playMsg = document.createElement('div');
+                    playMsg.textContent = 'Click to play audio response';
+                    playMsg.style.color = '#60a5fa';
+                    playMsg.style.fontSize = '12px';
+                    playMsg.style.marginTop = '4px';
+                    audioDiv.appendChild(playMsg);
+                }
+                
+            } catch (error) {
+                console.error('Error creating audio blob:', error);
+                const errorMsg = document.createElement('div');
+                errorMsg.textContent = 'Error: Could not create audio';
+                errorMsg.style.color = '#ff6b6b';
+                audioDiv.appendChild(errorMsg);
+                messageDiv.appendChild(audioDiv);
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+        
+        function showTypingIndicator() {
+            clearEmptyState();
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'typing-dot';
+                typingDiv.appendChild(dot);
+            }
+            
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        async function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                return;
+            }
+            
+            // Initialize voice detection first
+            const voiceInitialized = await initializeVoiceDetection();
+            if (!voiceInitialized) {
+                return;
+            }
+            
+            ws = new WebSocket('ws://localhost:8000/ws');
+            
+            ws.onopen = function() {
+                updateStatus('In Call', 'connected');
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                sendBtn.disabled = false;
+                isCallActive = true;
+                
+                // Show voice activity indicator
+                voiceActivity.classList.remove('hidden');
+                updateVoiceActivity('Listening...', 'listening');
+                
+                // Start voice activity detection
+                startVoiceActivityDetection();
+                
+                addMessage('📞 Call started! Speak naturally - the system will detect your voice and respond automatically.', 'system');
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'status') {
+                    if (data.message.includes('Processing')) {
+                        showTypingIndicator();
+                        updateVoiceActivity('Processing...', 'processing');
+                    }
+                    addMessage(data.message, 'system');
+                } else if (data.type === 'audio_response') {
+                    hideTypingIndicator();
+                    isProcessing = false;
+                    
+                    try {
+                        // Decode base64 audio and play
+                        const audioData = atob(data.audio);
+                        const audioArray = new Uint8Array(audioData.length);
+                        for (let i = 0; i < audioData.length; i++) {
+                            audioArray[i] = audioData.charCodeAt(i);
+                        }
+                        addAudioMessage(audioArray, 'bot');
+                        
+                        // Resume listening after response
+                        if (isCallActive) {
+                            updateVoiceActivity('Listening...', 'listening');
+                        }
+                    } catch (error) {
+                        console.error('Error playing audio:', error);
+                        addMessage('Error: Could not play audio response', 'system');
+                        
+                        // Resume listening after error
+                        if (isCallActive) {
+                            updateVoiceActivity('Listening...', 'listening');
+                        }
+                    }
+                } else if (data.type === 'text_response') {
+                    hideTypingIndicator();
+                    addMessage(data.text, 'bot', data.rag_info);
+                } else if (data.type === 'error') {
+                    hideTypingIndicator();
+                    isProcessing = false;
+                    addMessage(`Error: ${data.message}`, 'system');
+                    
+                    // Resume listening after error
+                    if (isCallActive) {
+                        updateVoiceActivity('Listening...', 'listening');
+                    }
+                }
+            };
+            
+            ws.onclose = function() {
+                cleanupVoiceDetection();
+                updateStatus('Call Ended', 'disconnected');
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                sendBtn.disabled = true;
+                voiceActivity.classList.add('hidden');
+                addMessage('📞 Call ended', 'system');
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                addMessage('Connection error occurred', 'system');
+            };
+        }
+        
+        function disconnect() {
+            cleanupVoiceDetection();
+            if (ws) {
+                ws.close();
+            }
+        }
+        
+        async function startRecording() {
+            if (isRecording || isProcessing || !stream) return;
+            
+            try {
+                // Use optimized MediaRecorder settings for speed
+                const options = {
+                    mimeType: 'audio/webm;codecs=opus', // Faster encoding
+                    audioBitsPerSecond: 64000 // Lower bitrate for speed
+                };
+                
+                // Fallback to default if not supported
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                    mediaRecorder = new MediaRecorder(stream);
+                } else {
+                    mediaRecorder = new MediaRecorder(stream, options);
+                }
+                
+                audioChunks = [];
+                
+                // Process audio in smaller chunks for faster response
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = function() {
+                    const audioBlob = new Blob(audioChunks, { 
+                        type: mediaRecorder.mimeType || 'audio/webm' 
+                    });
+                    sendAudioMessage(audioBlob);
+                };
+                
+                // Start recording with time slicing for faster processing
+                mediaRecorder.start(100); // 100ms chunks
+                isRecording = true;
+                
+                addMessage('🎤 Voice detected - recording...', 'user');
+                
+            } catch (error) {
+                console.error('Error starting recording:', error);
+                addMessage('Error: Could not start recording', 'system');
+            }
+        }
+        
+        function stopRecording() {
+            if (!isRecording) return;
+            
+            mediaRecorder.stop();
+            isRecording = false;
+            isProcessing = true;
+            
+            updateVoiceActivity('Processing...', 'processing');
+            addMessage('🎤 Voice message sent', 'user');
+        }
+        
+        function sendAudioMessage(audioBlob) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const audioData = reader.result.split(',')[1]; // Remove data URL prefix
+                
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({
+                        type: 'audio',
+                        audio: audioData
+                    }));
+                } else {
+                    addMessage('Error: Not connected to server', 'system');
+                }
+                
+                isProcessing = false;
+            };
+            reader.readAsDataURL(audioBlob);
+        }
+        
+        function sendTextMessage() {
+            const text = textInput.value.trim();
+            if (!text) return;
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'text',
+                    text: text
+                }));
+                
+                addMessage(text, 'user');
+                textInput.value = '';
+            } else {
+                addMessage('Error: Not connected to server', 'system');
+            }
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendTextMessage();
+            }
+        }
+        
+        // Auto-focus on text input when page loads
+        window.onload = function() {
+            textInput.focus();
+        };
+    </script>
+</body>
+</html>
