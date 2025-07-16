@@ -16,9 +16,22 @@ from rag import RAGHandler
 
 from llama_index.llms.gemini import Gemini
 gemini_llm = Gemini(model_name="models/gemini-2.5-flash")
+
 def translate_nepali_to_english(text):
     # Use Gemini API for translation
     prompt = f"Translate the following Nepali text to English. Only return the translation, no explanations:\n\n{text}"
+    result = gemini_llm.complete(prompt)
+    return str(result).strip()
+
+def translate_english_to_nepali(text):
+    # Use Gemini API for translation and summarization
+    prompt = (
+        "Translate the following English text to Nepali for a phone call. "
+        "Summarize and keep the response short and clear. "
+        "Do not use any digits in the Nepali response; write numbers in Nepali words. "
+        "Only return the Nepali summary, no explanations, and do not repeat the original question.\n\n"
+        f"English response: {text}"
+    )
     result = gemini_llm.complete(prompt)
     return str(result).strip()
 
