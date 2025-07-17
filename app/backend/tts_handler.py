@@ -10,7 +10,7 @@ class TTSHandler:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = VitsModel.from_pretrained("procit001/nepali_male_v1").to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained("procit001/nepali_male_v1")
-        self.speaking_rate = 0.8  # Slower speech (0.8 = 80% of normal speed)
+        self.speaking_rate = 1  # Slower speech (0.8 = 80% of normal speed)
 
     def synthesize(self, text: str) -> bytes:
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
