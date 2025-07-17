@@ -43,7 +43,7 @@ class RAGHandler:
                 vector_store=vector_store,
                 storage_context=storage_context
             )
-            self.retriever = index.as_retriever(similarity_top_k=3)
+            self.retriever = index.as_retriever(similarity_top_k=5)
         except Exception as e:
             logging.error(f"Error initializing RAG system: {e}")
             self.retriever = None

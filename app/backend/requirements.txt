@@ -11,3 +11,4 @@ llama-index-vector-stores-chroma
 numpy
 webrtcvad
 python-dotenv
+scipy

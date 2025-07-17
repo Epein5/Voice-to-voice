@@ -3,54 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voice Call Bot</title>
+    <title>Kathmandu University Voice Assistant</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>🎙️ Voice Call Bot</h1>
-        <div class="status-card card">
-            <h2>Model Status</h2>
-            <ul id="modelStatus">
-                <li>STT: <span class="status-dot" id="sttStatus"></span></li>
-                <li>TTS: <span class="status-dot" id="ttsStatus"></span></li>
-                <li>RAG: <span class="status-dot" id="ragStatus"></span></li>
-                <li>Gemini: <span class="status-dot" id="geminiStatus"></span></li>
-            </ul>
-        </div>
-        <div class="conversation-card card">
-            <h2>Conversation</h2>
-            <div id="conversation" class="conversation"></div>
-            <div class="controls">
-                <button id="recordBtn">🎤 Start Voice Detection</button>
-                <input type="text" id="textInput" placeholder="Type your message...">
-                <button id="sendTextBtn">Send</button>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-microphone-alt"></i>
+                    <h1>Kathmandu University Voice Assistant</h1>
+                </div>
+                <div class="connection-status" id="connectionStatus">
+                    <i class="fas fa-circle"></i>
+                    <span>Connecting...</span>
+                </div>
             </div>
-            <div class="controls" style="margin-top: 10px;">
-                <label for="sensitivitySlider">Voice Sensitivity (Lower = Need Louder Speech):</label>
-                <input type="range" id="sensitivitySlider" min="0" max="1" step="0.1" value="0.2">
-                <span id="sensitivityValue">0.2</span>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Left Panel - Conversation -->
+            <div class="conversation-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-comments"></i> Conversation</h2>
+                    <div class="voice-indicator" id="voiceIndicator">
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                        <div class="voice-wave"></div>
+                    </div>
+                </div>
+
+                <div class="conversation-container">
+                    <div id="conversation" class="conversation"></div>
+                </div>
+
+                <div class="input-section">
+                    <div class="voice-controls">
+                        <button id="recordBtn" class="voice-btn">
+                            <i class="fas fa-microphone"></i>
+                            <span>Start Voice Detection</span>
+                        </button>
+                        <div class="sensitivity-control">
+                            <label for="sensitivitySlider">
+                                <i class="fas fa-volume-up"></i>
+                                Sensitivity
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="sensitivitySlider" min="0" max="1" step="0.1" value="0.2">
+                                <span id="sensitivityValue">0.2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-input-section">
+                        <div class="input-group">
+                            <input type="text" id="textInput" placeholder="Type your message here...">
+                            <button id="sendTextBtn" class="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <audio id="audioPlayer" controls class="audio-player"></audio>
             </div>
-            <audio id="audioPlayer" controls style="display:none;"></audio>
-        </div>
-        <div class="info-row">
-            <div class="agent-card card">
-                <h3>Agent Decision</h3>
-                <div id="agentDecision">-</div>
+
+            <!-- Right Panel - System Info -->
+            <div class="info-panel">
+                <!-- System Status -->
+                <div class="status-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-cogs"></i> System Status</h3>
+                    </div>
+                    <div class="status-grid">
+                        <div class="status-item" id="sttStatusItem">
+                            <div class="status-icon">
+                                <i class="fas fa-microphone"></i>
+                            </div>
+                            <div class="status-info">
+                                <span class="status-label">Speech-to-Text</span>
+                                <div class="status-indicator" id="sttStatus"></div>
+                            </div>
+                        </div>
+                        <div class="status-item" id="ttsStatusItem">
+                            <div class="status-icon">
+                                <i class="fas fa-volume-up"></i>
+                            </div>
+                            <div class="status-info">
+                                <span class="status-label">Text-to-Speech</span>
+                                <div class="status-indicator" id="ttsStatus"></div>
+                            </div>
+                        </div>
+                        <div class="status-item" id="ragStatusItem">
+                            <div class="status-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="status-info">
+                                <span class="status-label">Knowledge Base</span>
+                                <div class="status-indicator" id="ragStatus"></div>
+                            </div>
+                        </div>
+                        <div class="status-item" id="geminiStatusItem">
+                            <div class="status-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="status-info">
+                                <span class="status-label">AI Model</span>
+                                <div class="status-indicator" id="geminiStatus"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agent Decision -->
+                <div class="decision-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-robot"></i> Agent Decision</h3>
+                    </div>
+                    <div class="decision-content">
+                        <div id="agentDecision" class="decision-badge">Waiting...</div>
+                        <div id="decisionDescription" class="decision-description"></div>
+                    </div>
+                </div>
+
+                <!-- Retrieved Content -->
+                <div class="rag-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-search"></i> Retrieved Knowledge</h3>
+                        <button class="collapse-btn" id="ragCollapseBtn">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div class="rag-content" id="ragContent">
+                        <div id="ragContext" class="rag-text">No knowledge retrieved yet...</div>
+                    </div>
+                </div>
+
+                <!-- Process Log -->
+                <div class="log-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-list-ul"></i> Process Log</h3>
+                        <button class="collapse-btn" id="logCollapseBtn">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </div>
+                    <div class="log-content" id="logContent">
+                        <div id="stepLog" class="step-log"></div>
+                    </div>
+                </div>
             </div>
-            <div class="rag-card card">
-                <h3>RAG Retrieved Content</h3>
-                <pre id="ragContext">-</pre>
-            </div>
-        </div>
-        <div class="log-card card">
-            <h3>Task Log</h3>
-            <ul id="stepLog"></ul>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Processing your request...</p>
         </div>
     </div>
+
     <script src="/static/app.js"></script>
 </body>
-</html> 
+</html>

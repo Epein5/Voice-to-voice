@@ -116,7 +116,10 @@ async def websocket_endpoint(websocket: WebSocket):
                                 client_data['current_time'] += 0.1  # 100ms chunks
 
                                 if complete_speech is not None:
-                                    # Complete speech detected, process it
+                                    # Complete speech detected, send clear signal and process it
+                                    await websocket.send_text(json.dumps({
+                                        "type": "clear_processing_log"
+                                    }))
                                     await process_complete_speech(websocket, complete_speech, step_log=[])
 
                         except Exception as e:
@@ -258,9 +261,22 @@ async def websocket_endpoint(websocket: WebSocket):
             pass
 
 async def process_complete_speech(websocket: WebSocket, audio_data: np.ndarray, step_log: list):
-    """Process a complete speech segment detected by VAD"""
+    """Process a complete speech segment detected by VAD with real-time updates"""
+    import time
+
     try:
         # Convert numpy array to audio bytes for STT
+        start_time = time.time()
+
+        # Send real-time update: Starting STT
+        await websocket.send_text(json.dumps({
+            "type": "realtime_update",
+            "task": "stt",
+            "status": "processing",
+            "message": "🎤 Speech-to-Text प्रक्रिया सुरु भयो...",
+            "timestamp": time.time()
+        }))
+
         with io.BytesIO() as wav_buffer:
             sf.write(wav_buffer, audio_data, 16000, format='WAV')
             wav_buffer.seek(0)
@@ -268,45 +284,206 @@ async def process_complete_speech(websocket: WebSocket, audio_data: np.ndarray, 
 
         step_log.append("VAD detected complete speech segment.")
 
-        # Process the speech using existing pipeline
+        # Process STT
+        stt_start = time.time()
         nepali_text = stt_handler.transcribe(audio_bytes)
+        stt_time = time.time() - stt_start
+
         step_log.append(f"STT output: {nepali_text}")
 
+        # Send STT completion update
+        await websocket.send_text(json.dumps({
+            "type": "realtime_update",
+            "task": "stt",
+            "status": "completed",
+            "message": f"✅ Speech-to-Text सम्पन्न ({stt_time:.1f}s)",
+            "result": nepali_text,
+            "duration": stt_time,
+            "timestamp": time.time()
+        }))
+
+        # Agent decision
+        await websocket.send_text(json.dumps({
+            "type": "realtime_update",
+            "task": "agent",
+            "status": "processing",
+            "message": "🤖 Agent निर्णय गर्दै...",
+            "timestamp": time.time()
+        }))
+
+        agent_start = time.time()
         agent_decision = agent.classify(nepali_text)
+        agent_time = time.time() - agent_start
+
         step_log.append(f"Agent decision: {agent_decision}")
+
+        await websocket.send_text(json.dumps({
+            "type": "realtime_update",
+            "task": "agent",
+            "status": "completed",
+            "message": f"✅ Agent निर्णय: {agent_decision} ({agent_time:.1f}s)",
+            "result": agent_decision,
+            "duration": agent_time,
+            "timestamp": time.time()
+        }))
 
         rag_context = None
         if agent_decision == "rag":
-            # Send "please wait" message immediately
+            # Send initial wait message
             await websocket.send_text(json.dumps({
                 "type": "text_response",
-                "text": "ठीक छ, कृपया पर्खनुहोस्। म जानकारी खोज्दै छु...",
+                "text": "कृपया केही क्षण कुर्नुहोस्, म जानकारी खोज्दै छु। यसले केही समय लाग्न सक्छ।",
                 "agent_decision": "searching",
                 "step_log": step_log
             }))
 
+            # Translation step
+            await websocket.send_text(json.dumps({
+                "type": "realtime_update",
+                "task": "translation",
+                "status": "processing",
+                "message": "🌐 नेपालीबाट अंग्रेजीमा अनुवाद गर्दै...",
+                "timestamp": time.time()
+            }))
+
+            translation_start = time.time()
             english_query = translate_nepali_to_english(nepali_text)
+            translation_time = time.time() - translation_start
+
             step_log.append(f"Translated to English: {english_query}")
+
+            await websocket.send_text(json.dumps({
+                "type": "realtime_update",
+                "task": "translation",
+                "status": "completed",
+                "message": f"✅ अनुवाद सम्पन्न ({translation_time:.1f}s)",
+                "result": english_query,
+                "duration": translation_time,
+                "timestamp": time.time()
+            }))
+
+            # RAG search step
+            await websocket.send_text(json.dumps({
+                "type": "realtime_update",
+                "task": "rag",
+                "status": "processing",
+                "message": "🔍 Knowledge Base मा खोज्दै...",
+                "timestamp": time.time()
+            }))
+
+            rag_start = time.time()
             rag_context = rag_handler.query(english_query)
+            rag_time = time.time() - rag_start
+
             step_log.append(f"RAG context: {rag_context}")
+
+            await websocket.send_text(json.dumps({
+                "type": "realtime_update",
+                "task": "rag",
+                "status": "completed",
+                "message": f"✅ Knowledge Base खोज सम्पन्न ({rag_time:.1f}s)",
+                "duration": rag_time,
+                "timestamp": time.time()
+            }))
+
+            # LLM processing step
+            await websocket.send_text(json.dumps({
+                "type": "realtime_update",
+                "task": "llm",
+                "status": "processing",
+                "message": "🧠 AI मोडेलले जवाफ तयार गर्दै...",
+                "timestamp": time.time()
+            }))
+
+            llm_start = time.time()
             nepali_response = summarize_rag_to_nepali(rag_context, nepali_text)
+            llm_time = time.time() - llm_start
+
             step_log.append(f"LLM summarized to Nepali: {nepali_response}")
+
+            await websocket.send_text(json.dumps({
+                "type": "realtime_update",
+                "task": "llm",
+                "status": "completed",
+                "message": f"✅ AI जवाफ तयार ({llm_time:.1f}s)",
+                "duration": llm_time,
+                "timestamp": time.time()
+            }))
+
         else:
+            # Normal conversation LLM
+            await websocket.send_text(json.dumps({
+                "type": "realtime_update",
+                "task": "llm",
+                "status": "processing",
+                "message": "🧠 AI मोडेलले जवाफ तयार गर्दै...",
+                "timestamp": time.time()
+            }))
+
+            llm_start = time.time()
             nepali_response = agent.normal_conversation(nepali_text)
+            llm_time = time.time() - llm_start
+
             step_log.append(f"LLM conversational response: {nepali_response}")
 
+            await websocket.send_text(json.dumps({
+                "type": "realtime_update",
+                "task": "llm",
+                "status": "completed",
+                "message": f"✅ AI जवाफ तयार ({llm_time:.1f}s)",
+                "duration": llm_time,
+                "timestamp": time.time()
+            }))
+
+        # TTS processing step
+        await websocket.send_text(json.dumps({
+            "type": "realtime_update",
+            "task": "tts",
+            "status": "processing",
+            "message": "🔊 Text-to-Speech तयार गर्दै...",
+            "timestamp": time.time()
+        }))
+
+        tts_start = time.time()
         audio_response = tts_handler.synthesize(nepali_response)
+        tts_time = time.time() - tts_start
+
         step_log.append("TTS synthesized audio.")
         response_audio_b64 = base64.b64encode(audio_response).decode('utf-8')
 
+        await websocket.send_text(json.dumps({
+            "type": "realtime_update",
+            "task": "tts",
+            "status": "completed",
+            "message": f"✅ Audio तयार ({tts_time:.1f}s)",
+            "duration": tts_time,
+            "timestamp": time.time()
+        }))
+
+        # Calculate total processing time
+        total_time = time.time() - start_time
+
+        # Send final completion update
+        await websocket.send_text(json.dumps({
+            "type": "realtime_update",
+            "task": "complete",
+            "status": "completed",
+            "message": f"🎉 सम्पूर्ण प्रक्रिया सम्पन्न! कुल समय: {total_time:.1f}s",
+            "total_duration": total_time,
+            "timestamp": time.time()
+        }))
+
+        # Send final response
         await websocket.send_text(json.dumps({
             "type": "text_response",
             "text": nepali_response,
             "agent_decision": agent_decision,
             "rag_context": rag_context,
             "step_log": step_log,
-            "input_text": nepali_text  # Include the detected speech
+            "input_text": nepali_text,
+            "processing_time": total_time
         }))
+
         await websocket.send_text(json.dumps({
             "type": "audio_response",
             "audio": response_audio_b64
@@ -314,6 +491,13 @@ async def process_complete_speech(websocket: WebSocket, audio_data: np.ndarray, 
 
     except Exception as e:
         logger.error(f"Error processing complete speech: {e}")
+        await websocket.send_text(json.dumps({
+            "type": "realtime_update",
+            "task": "error",
+            "status": "error",
+            "message": f"❌ Error: {str(e)}",
+            "timestamp": time.time()
+        }))
         await websocket.send_text(json.dumps({
             "type": "error",
             "message": f"Speech processing error: {str(e)}",
